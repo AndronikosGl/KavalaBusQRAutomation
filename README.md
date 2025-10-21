@@ -1,3 +1,4 @@
 # KavalaBusQRAutomation
 Redirecting to a bus stop url by using geolocation automatically so you dont have to manually scan a QR code to see the next bus
-## This is just experimental and hasn't been tested yet
+## This is just experimental
+This has been created using chatgpt for my personal convinience and its not yet tested
