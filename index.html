@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kavala Bus Stops</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    #status {
+      font-size: 1.3rem;
+      color: #333;
+      padding: 10px 20px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <span id="status">Retrieving location...</span>
+
+  <script>
+    // Οι στάσεις και τα URLs τους
+    const stops = [
+      { id: 218, lat: 40.934560, lon: 24.394585, url: "https://kavala.citybus.gr/el/stops/live/218" },
+      { id: 135, lat: 40.934436, lon: 24.394580, url: "https://kavala.citybus.gr/el/stops/live/135" },
+      { id: 283, lat: 40.934207, lon: 24.393694, url: "https://kavala.citybus.gr/el/stops/live/283" },
+      { id: 218, lat: 40.933938, lon: 24.393380, url: "https://kavala.citybus.gr/el/stops/live/218" },
+      { id: 121, lat: 40.929423, lon: 24.382576, url: "https://kavala.citybus.gr/el/stops/live/121" }
+    ];
+
+    const statusEl = document.getElementById("status");
+
+    // Υπολογισμός απόστασης μεταξύ δύο συντεταγμένων (σε μέτρα)
+    function getDistance(lat1, lon1, lat2, lon2) {
+      const R = 6371e3; // ακτίνα Γης σε μέτρα
+      const φ1 = lat1 * Math.PI/180;
+      const φ2 = lat2 * Math.PI/180;
+      const Δφ = (lat2-lat1) * Math.PI/180;
+      const Δλ = (lon2-lon1) * Math.PI/180;
+
+      const a = Math.sin(Δφ/2)**2 +
+                Math.cos(φ1) * Math.cos(φ2) *
+                Math.sin(Δλ/2)**2;
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+      return R * c;
+    }
+
+    // Αν έχουμε ήδη δώσει άδεια στο παρελθόν
+    if (localStorage.getItem("locationPermission") === "granted") {
+      getLocation();
+    } else {
+      navigator.permissions.query({ name: "geolocation" }).then(result => {
+        if (result.state === "granted") {
+          localStorage.setItem("locationPermission", "granted");
+          getLocation();
+        } else {
+          navigator.geolocation.getCurrentPosition(
+            pos => {
+              localStorage.setItem("locationPermission", "granted");
+              handlePosition(pos);
+            },
+            err => {
+              statusEl.textContent = "Location denied.";
+            }
+          );
+        }
+      });
+    }
+
+    function getLocation() {
+      statusEl.textContent = "Retrieving location...";
+      navigator.geolocation.getCurrentPosition(
+        handlePosition,
+        err => statusEl.textContent = "Could not retrieve location."
+      );
+    }
+
+    function handlePosition(pos) {
+      const { latitude, longitude } = pos.coords;
+      let found = false;
+
+      for (const stop of stops) {
+        const dist = getDistance(latitude, longitude, stop.lat, stop.lon);
+        if (dist < 20) { // μέσα σε 20 μέτρα
+          found = true;
+          statusEl.textContent = "Redirecting...";
+          setTimeout(() => window.location.href = stop.url, 1500);
+          break;
+        }
+      }
+
+      if (!found) {
+        statusEl.textContent = "No match found...";
+      }
+    }
+  </script>
+</body>
+</html>
