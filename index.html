@@ -32,12 +32,12 @@
   <script>
     // Οι στάσεις και τα URLs τους
     const stops = [
-      { id: 218, lat: 40.934560, lon: 24.394585, url: "https://kavala.citybus.gr/el/stops/live/218" },
-      { id: 135, lat: 40.934436, lon: 24.394580, url: "https://kavala.citybus.gr/el/stops/live/135" },
-      { id: 283, lat: 40.934207, lon: 24.393694, url: "https://kavala.citybus.gr/el/stops/live/283" },
-      { id: 218, lat: 40.933938, lon: 24.393380, url: "https://kavala.citybus.gr/el/stops/live/218" },
-      { id: 121, lat: 40.929423, lon: 24.382576, url: "https://kavala.citybus.gr/el/stops/live/121" }
-    ];
+  { id: 135, lat: 40.934436, lon: 24.394580, url: "https://kavala.citybus.gr/el/stops/live/135" },
+  { id: 283, lat: 40.934207, lon: 24.393694, url: "https://kavala.citybus.gr/el/stops/live/283" },
+  { id: 218, lat: 40.933938, lon: 24.393380, url: "https://kavala.citybus.gr/el/stops/live/218" },
+  { id: 121, lat: 40.929423, lon: 24.382576, url: "https://kavala.citybus.gr/el/stops/live/121" }
+];
+
 
     const statusEl = document.getElementById("status");
 
@@ -93,7 +93,7 @@
 
       for (const stop of stops) {
         const dist = getDistance(latitude, longitude, stop.lat, stop.lon);
-        if (dist < 20) { // μέσα σε 20 μέτρα
+        if (dist < 200) { // μέσα σε 20 μέτρα
           found = true;
           statusEl.textContent = "Redirecting...";
           setTimeout(() => window.location.href = stop.url, 1500);
